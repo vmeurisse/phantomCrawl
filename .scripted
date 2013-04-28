@@ -1,0 +1,8 @@
+{
+	jshint: {
+		options: {
+			browser: true,
+			node: true
+		}
+	}
+}

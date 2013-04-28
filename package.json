@@ -1,0 +1,14 @@
+{
+	"name": "phantomCrawl",
+	"version": "0.0.1",
+	"author": "Vincent Meurisse <dev@meurisse.org>",
+	"description": "Web crawler for ajax applications",
+	"keywords": ["ajax", "crawler", "crawl", "SEO", "phantom", "phantomjs"],
+	"dependencies": {
+		"async": "0.2.x",
+		"node-fs": "~0.1.5",
+		"node-phantom": "https://github.com/vmeurisse/node-phantom/archive/f42c337e7037cf495d02e86c5ea2250185bc14e4.tar.gz",
+		"phantomjs": "1.8.2-2",
+		"smpl": "0.2.0-alpha2"
+	}
+}
