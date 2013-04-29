@@ -44,8 +44,6 @@ PageReady.prototype.onResourceReceived = function (response) {
 		delete this.pendingRequest[response.id];
 		this.nbRequests--;
 		this.tick();
-	} else {
-		console.log(response);
 	}
 };
 
