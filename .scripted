@@ -2,7 +2,8 @@
 	jshint: {
 		options: {
 			browser: true,
-			node: true
+			node: true,
+			eqnull: true
 		}
 	}
 }
