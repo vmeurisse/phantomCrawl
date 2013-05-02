@@ -28,7 +28,7 @@ var contentFunction = function () {
 			var name = attribute.name;
 			var value = attribute.value;
 			if (name === 'href' || name === 'src') {
-				if (value === '#' || value === '') continue;
+				if (!value || value === '#') continue;
 				var newValue = urlMap[value];
 				if (newValue) {
 					node.setAttribute(name, newValue);

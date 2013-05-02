@@ -38,23 +38,24 @@ var Crawler = function(phantom, config) {
 	this.config = config;
 	
 	console.log('[' + this.id + '] crawling page ' + config.url.url);
-	
-	this.pageTransform = this.preprocessPlugins(config.pageTransform || DEFAULT_TRANSFORMS, STANDARD_TRANSFORMS);
-	this.plugins = this.preprocessPlugins(config.plugins || DEFAULT_PLUGINS, STANDARD_PLUGINS);
-	
+
 	this.executes = [];
+	
+	this.pageTransform = this.preprocessPlugins(config.pageTransform || DEFAULT_TRANSFORMS, STANDARD_TRANSFORMS, true);
+	this.plugins = this.preprocessPlugins(config.plugins || DEFAULT_PLUGINS, STANDARD_PLUGINS);
 	
 	phantom.createPage(this.onPageCreated.bind(this));
 };
 util.inherits(Crawler, EventEmitter);
 
-Crawler.prototype.preprocessPlugins = function(list, standards) {
+Crawler.prototype.preprocessPlugins = function(list, standards, exec) {
 	for (var i = 0; i < list.length; i++) {
 		var plugin = list[i];
 		if (typeof plugin === 'string') {
 			plugin = standards[plugin] || plugin;
-			list[i] = require(plugin);
+			list[i] = plugin = require(plugin);
 		}
+		if (exec) this.exec(plugin, null, 0);
 	}
 	return list;
 };
@@ -106,27 +107,27 @@ Crawler.prototype.pageReady = function() {
 		
 		this.emit('pageReady');
 		
-		async.eachSeries(this.pageTransform, (function(t, cb) {
-			if (this.closed) cb('closed');
-			else this.page.evaluate(t, cb);
-		}).bind(this), (function(err) {
-			async.eachSeries(this.executes, (function(exec, cb) {
-				if (this.closed) {
-					cb('closed');
-				} else {
-					this.page.evaluate(exec[0], function(err, res) {
-						if (exec[1]) exec[1](res);
-						cb(err);
-					});
-				}
-			}).bind(this), this.close.bind(this));
-		}).bind(this));
+		var order = 0;
+		async.forever((function(callback) {
+			if (order >= 11) return callback('done');
+			var exec = this.executes[order] && this.executes[order].shift();
+			if (!exec) {
+				order++;
+				return callback();
+			}
+			this.page.evaluate(exec[0], function(err, res) {
+				if (exec[1]) exec[1](res);
+				callback(err);
+			});
+		}).bind(this), this.close.bind(this));
 	}
 };
 
 Crawler.prototype.close = function(reason) {
 	if (!this.closed) {
 		this.closed = true;
+		
+		if (reason === 'done') reason = '';
 		
 		this.emit('close');
 		
@@ -140,8 +141,10 @@ Crawler.prototype.close = function(reason) {
 	}
 };
 
-Crawler.prototype.exec = function(fn, cb) {
-	this.executes.push([fn, cb]);
+Crawler.prototype.exec = function(fn, cb, order) {
+	if (order == null) order = 5;
+	if (!this.executes[order]) this.executes[order] = [];
+	this.executes[order].push([fn, cb]);
 };
 
 module.exports = Crawler;

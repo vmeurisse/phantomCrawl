@@ -17,7 +17,7 @@ var getHtml = function() {
 
 var PageSave = function(crawler) {
 	this.crawler = crawler;
-	crawler.on('pageReady', crawler.exec.bind(crawler, getHtml, this.save.bind(this)));
+	crawler.exec(getHtml, this.save.bind(this), 10);
 };
 
 PageSave.prototype.save = function(html) {
