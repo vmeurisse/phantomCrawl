@@ -2,7 +2,7 @@
 
 var smpl = require('smpl');
 
-var PAGE_EXT = smpl.data.index(['html', 'xhtml', 'htm', 'php', '']);
+var PAGE_EXT = smpl.data.index(['html', 'xhtml', 'htm', 'asp', 'aspx', 'jsp', 'php', 'py', '']);
 var PAGE_MIME = smpl.data.index(['text/html', 'application/xhtml+xml']);
 
 var urlType = {};
