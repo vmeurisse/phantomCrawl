@@ -78,7 +78,7 @@ Crawler.prototype.onRemoveListener = function(event) {
 
 Crawler.prototype.onPageCreated = function(err, page) {
 	console.log('[' + this.id + '] page created');
-	this.page = page;	
+	this.page = page;
 	page.get('settings', (function(e, settings) {
 		settings.userAgent = this.config.userAgent;
 		page.set('settings', settings, this.onPageSettings.bind(this));

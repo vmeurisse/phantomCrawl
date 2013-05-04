@@ -6,6 +6,9 @@ var urlType = require('../../url/urlType');
 var PageType = function(crawler) {
 	this.crawler = crawler;
 	
+	crawler.once('resourceRequested', (function(request) {
+		this.initialResourceId = request.id;
+	}).bind(this));
 	this.onResourceReceived = this.onResourceReceived.bind(this);
 	crawler.on('resourceReceived', this.onResourceReceived);
 };
@@ -13,7 +16,7 @@ var PageType = function(crawler) {
 PageType.prototype.onResourceReceived = function (response) {
 	if(response.stage !== 'end') return;
 	
-	if (response.id === 1) {
+	if (response.id === this.initialResourceId) {
 		this.crawler.removeListener('resourceReceived', this.onResourceReceived);
 		if (response.contentType && !urlType.isPageMime(response.contentType)) {
 			var url = this.crawler.config.url;

@@ -3,7 +3,7 @@
 module.exports = function() {
 	for (var i = 0; i < document.styleSheets.length; i++) {
 		var styleSheet = document.styleSheets[i];
-		if (styleSheet.cssRules && !styleSheet.href) {
+		if (!styleSheet.href && styleSheet.cssRules) {
 			var cssText = '';
 			var rules = styleSheet.cssRules;
 			for (var j = 0; j < rules.length; j++) {

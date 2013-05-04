@@ -4,6 +4,7 @@ var PageReady = function(crawler) {
 	this.crawler = crawler;
 	
 	this.nbRequests = 0;
+	this.started = false;
 	
 	crawler.on('resourceRequested', this.onResourceRequested.bind(this));
 	crawler.on('resourceReceived', this.onResourceReceived.bind(this));
@@ -24,7 +25,7 @@ PageReady.prototype.onTimeout = function(hard) {
 	this.ticker = null;
 	if (this.status === 'loaded') return;
 	if (hard === true || this.nbRequests === 0) {
-		if (this.nbRequests !== 0) console.warn('[' + this.crawler.id + '] Hard timeout on ' + this.crawler.config.url.url, this.nbRequests, this.pendingRequest);
+		if (!this.started || this.nbRequests !== 0) console.warn('[' + this.crawler.id + '] Hard timeout on ' + this.crawler.config.url.url, this.nbRequests, this.pendingRequest);
 		this.stop();
 		
 		this.status = 'loaded';
@@ -35,6 +36,7 @@ PageReady.prototype.onTimeout = function(hard) {
 PageReady.prototype.onResourceRequested = function (request) {
 	this.pendingRequest[request.id] = request;
 	this.nbRequests++;
+	this.started = true;
 	this.tick();
 };
 

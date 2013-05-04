@@ -20,7 +20,7 @@ module.exports = function() {
 						child.nodeValue = trimed;
 					}
 				}
-			} else {
+			} else if (child.nodeType !== 8) { // Comment
 				walk(child);
 			}
 		}
