@@ -70,7 +70,7 @@ PageRessources.prototype.onResourceReceived = function (response) {
 };
 
 PageRessources.prototype.addUrlMap = function(url) {
-	this.urlMap[url] = path.relative(this.pagePath, urlToPath.getPath(url));
+	this.urlMap[url] = path.relative(this.pagePath, urlToPath.getPath(url)).replace(/\\/g, '/');
 };
 
 PageRessources.prototype.onPageReady = function(url) {
