@@ -136,7 +136,7 @@ Crawler.prototype.close = function(reason) {
 		var self = this;
 		this.page.close(function(err) {
 			console.log('[' + self.id + '] done' + (reason ? ': ' + reason : ''));
-			self.config.onComplete();
+			self.config.onComplete(self.id);
 		});
 	}
 };

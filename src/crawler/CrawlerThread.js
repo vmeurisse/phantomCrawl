@@ -15,6 +15,7 @@ var CrawlerThread = function(config) {
 	this.nbCrawlers = 0;
 	this.maxCrawlers = config.nbCrawlers || 1;
 	this.userAgent = config.userAgent;
+	this.crawlers = {};
 	
 	require('node-phantom').create(this.phantomStarted.bind(this), {phantomPath:require('phantomjs').path});
 };
@@ -23,6 +24,9 @@ util.inherits(CrawlerThread, EventEmitter);
 CrawlerThread.prototype.phantomStarted = function(err, phantom) {
 	if (err) throw err;
 	
+	this.onPhantomExit = this.phantomExit.bind(this);
+	phantom.on('exit', this.onPhantomExit);
+
 	this.phantom = phantom;
 	if (this.doExit) {
 		this.exit();
@@ -48,12 +52,15 @@ CrawlerThread.prototype.startCrawling = function(url) {
 		userAgent: this.userAgent,
 		parentId: this.id
 	});
+	this.crawlers[crawler.id] = crawler;
+
 	if (this.nbCrawlers < this.maxCrawlers) {
 		this.requestUrl();
 	}
 };
 
-CrawlerThread.prototype.crawlDone = function() {
+CrawlerThread.prototype.crawlDone = function(id) {
+	delete this.crawlers[id];
 	this.nbCrawlers--;
 	if (this.nbCrawlers === 0) this.emit('idle');
 	this.requestUrl();
@@ -69,7 +76,15 @@ CrawlerThread.prototype.exit = function() {
 		// We might exit before phantom had time to start (eg. crawling only one image)
 		this.doExit = true;
 	} else {
+		this.phantom.removeListener('exit', this.onPhantomExit);
 		this.phantom.exit();
+	}
+};
+
+CrawlerThread.prototype.phantomExit = function() {
+	console.log('[' + this.id + '] Phantom crashed !');
+	for (var id in this.crawlers) {
+		//this.crawlers[id].close('phantom crash');
 	}
 };
 
