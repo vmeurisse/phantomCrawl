@@ -1,6 +1,7 @@
 'use strict';
 
 var http = require('http');
+var https = require('https');
 var urlModule = require('url');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
@@ -37,8 +38,9 @@ CrawlerThread.prototype.startCrawling = function(url) {
 	req.headers = {
 		'User-Agent': this.config.userAgent
 	};
-
-	http.get(req, this.crawlDone.bind(this, id, url)).on('error', this.crawlDone.bind(this, id, 'error'));
+	
+	var get = (url.url.slice(0, 5) === 'https') ? https.get : http.get;
+	get(req, this.crawlDone.bind(this, id, url)).on('error', this.crawlDone.bind(this, id, 'error'));
 };
 
 CrawlerThread.prototype.crawlDone = function(id, url, res) {
