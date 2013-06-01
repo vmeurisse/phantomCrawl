@@ -19,7 +19,7 @@ var urlStore = {
 	urlRessources: [],
 	cbPages: [],
 	cbRessources: [],
-	ongoingCallbacks: 0
+	ongoingCallbacks: []
 };
 
 urlStore.setFilters = function(filters) {
@@ -53,7 +53,7 @@ urlStore.add = function(url, force) {
 		
 		var cb = this['cb' + type];
 		if (cb.length) {
-			this.call(cb.shift(), url);
+			this.call(cb.shift(), url, type);
 		} else {
 			var list = this['url' + type];
 			list.push(url);
@@ -82,6 +82,10 @@ urlStore.getPage = function(cb) {
 	this.get('Pages', cb);
 };
 
+urlStore.cancelGetPage = function(cb) {
+	this.cancelGet('Pages', cb);
+};
+
 urlStore.getRessource = function(cb) {
 	this.get('Ressources', cb);
 };
@@ -93,23 +97,43 @@ urlStore.get = function(type, cb) {
 	var list = this['url' + type];
 	if (list.length) {
 		var url = list.splice(smpl.number.randomInt(0, list.length), 1)[0];
-		this.call(cb, url);
+		this.call(cb, url, type);
 	} else {
 		var cbList = this['cb' + type];
 		cbList.push(cb);
 	}
 };
 
-urlStore.isEmpty = function() {
-	return this.urlRessources.length + this.urlPages.length + this.ongoingCallbacks === 0;
+/**
+ * @private
+ */
+urlStore.cancelGet = function(type, callback) {
+	var cbList = this['cb' + type];
+	this['cb' + type] = this['cb' + type].filter(function(cb) {
+		return cb !== callback;
+	});
+	this.ongoingCallbacks = this.ongoingCallbacks.filter(function(cb) {
+		return cb[0] !== callback || cb[2] !== type;
+	});
 };
 
-urlStore.call = function(cb, url) {
-	this.ongoingCallbacks++;
-	(global.setImmediate || process.nextTick)((function() { //setImmediate introduced in node 0.10
-		this.ongoingCallbacks--;
-		cb(url);
-	}).bind(this));
+urlStore.isEmpty = function() {
+	return this.urlRessources.length + this.urlPages.length + this.ongoingCallbacks.length === 0;
+};
+
+/**
+ * @private
+ */
+urlStore.call = function(cb, url, type) {
+	this.ongoingCallbacks.push([cb, url, type]);
+	if (this.ongoingCallbacks.length === 1) {
+		(global.setImmediate || process.nextTick)((function() { //setImmediate introduced in node 0.10
+			var cb;
+			while (cb = this.ongoingCallbacks.shift()) {
+				cb[0](cb[1]);
+			}
+		}).bind(this));
+	}
 };
 
 module.exports = urlStore;

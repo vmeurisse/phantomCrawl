@@ -45,6 +45,8 @@ var Crawler = function(phantom, config) {
 	this.plugins = this.preprocessPlugins(config.plugins || DEFAULT_PLUGINS, STANDARD_PLUGINS);
 	
 	phantom.createPage(this.onPageCreated.bind(this));
+	this.onCrash = this.crashed.bind(this);
+	config.thread.on('crash', this.onCrash);
 };
 util.inherits(Crawler, EventEmitter);
 
@@ -130,15 +132,26 @@ Crawler.prototype.close = function(reason) {
 		if (reason === 'done') reason = '';
 		
 		this.emit('close');
-		
+
+		this.config.thread.removeListener('crash', this.onCrash);
 		this.removeAllListeners();
 		
-		var self = this;
-		this.page.close(function(err) {
-			console.log('[' + self.id + '] done' + (reason ? ': ' + reason : ''));
-			self.config.onComplete(self.id);
-		});
+		if (!this.phantomCrashed) {
+			this.page.close(this.onClosed.bind(this, reason));
+		} else {
+			this.onClosed(reason);
+		}
 	}
+};
+
+Crawler.prototype.onClosed = function(reason) {
+	console.log('[' + this.id + '] done' + (reason ? ': ' + reason : ''));
+	this.config.onComplete();
+};
+
+Crawler.prototype.crashed = function() {
+	this.phantomCrashed = true;
+	this.close('phantom crashed');
 };
 
 Crawler.prototype.exec = function(fn, cb, order) {

@@ -15,9 +15,10 @@ var CrawlerThread = function(config) {
 	this.nbCrawlers = 0;
 	this.maxCrawlers = config.nbCrawlers || 1;
 	this.userAgent = config.userAgent;
-	this.crawlers = {};
 	
-	require('node-phantom').create(this.phantomStarted.bind(this), {phantomPath:require('phantomjs').path});
+	this.startCrawling = this.startCrawling.bind(this);
+	
+	require('node-phantom').create(this.phantomStarted.bind(this), {phantomPath: require('phantomjs').path});
 };
 util.inherits(CrawlerThread, EventEmitter);
 
@@ -36,8 +37,8 @@ CrawlerThread.prototype.phantomStarted = function(err, phantom) {
 };
 
 CrawlerThread.prototype.requestUrl = function() {
-	if (!this.urlRequestRunning) {
-		urlStore.getPage(this.startCrawling.bind(this));
+	if (!this.urlRequestRunning && !this.exited) {
+		urlStore.getPage(this.startCrawling);
 		this.urlRequestRunning = true;
 	}
 };
@@ -50,17 +51,16 @@ CrawlerThread.prototype.startCrawling = function(url) {
 		url: url,
 		onComplete: this.crawlDone.bind(this),
 		userAgent: this.userAgent,
-		parentId: this.id
+		parentId: this.id,
+		thread: this
 	});
-	this.crawlers[crawler.id] = crawler;
 
 	if (this.nbCrawlers < this.maxCrawlers) {
 		this.requestUrl();
 	}
 };
 
-CrawlerThread.prototype.crawlDone = function(id) {
-	delete this.crawlers[id];
+CrawlerThread.prototype.crawlDone = function() {
 	this.nbCrawlers--;
 	if (this.nbCrawlers === 0) this.emit('idle');
 	this.requestUrl();
@@ -72,6 +72,7 @@ CrawlerThread.prototype.isIdle = function() {
 
 CrawlerThread.prototype.exit = function() {
 	console.log('[' + this.id + '] Exiting CrawlerThread');
+	this.exited = true;
 	if (!this.phantom) {
 		// We might exit before phantom had time to start (eg. crawling only one image)
 		this.doExit = true;
@@ -83,9 +84,12 @@ CrawlerThread.prototype.exit = function() {
 
 CrawlerThread.prototype.phantomExit = function() {
 	console.log('[' + this.id + '] Phantom crashed !');
-	for (var id in this.crawlers) {
-		//this.crawlers[id].close('phantom crash');
+	if (this.urlRequestRunning) {
+		urlStore.cancelGetPage(this.startCrawling);
+		this.urlRequestRunning = false;
 	}
+	this.exit();
+	this.emit('crash');
 };
 
 module.exports = CrawlerThread;
