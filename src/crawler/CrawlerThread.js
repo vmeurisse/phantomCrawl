@@ -8,11 +8,22 @@ var smpl = require('smpl');
 var Crawler = require('./Crawler');
 var urlStore = require('../url/urlStore');
 
+/**
+ * @class CrawlerThread
+ * @constructor
+ *
+ * @param config {Object}
+ * @param [config.nbCrawlers] {integer} Number of pages to crawl in parallel
+ * @param config.userAgent {string} User agent to use for the crawling
+ * @param [config.crashRecover=false] {boolean} If true, will crawl the URLs from the previously crashed threads
+ * @param [config.pageTransform] {Array}
+ * @param [config.plugins] {Array}
+ */
 var CrawlerThread = function(config) {
+	this.config = config;
 	this.id = smpl.utils.uniq();
-	this.crashRecover = config.crashRecover;
 	
-	console.log('[' + this.id + '] Starting ' + (this.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
+	console.log('[' + this.id + '] Starting ' + (this.config.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
 	this.nbCrawlers = 0;
 	this.maxCrawlers = config.nbCrawlers || 1;
 	this.userAgent = config.userAgent;
@@ -39,7 +50,7 @@ CrawlerThread.prototype.phantomStarted = function(err, phantom) {
 
 CrawlerThread.prototype.requestUrl = function() {
 	if (!this.urlRequestRunning && !this.exited) {
-		urlStore[this.crashRecover ? 'getCrashedPage' : 'getPage'](this.startCrawling);
+		urlStore[this.config.crashRecover ? 'getCrashedPage' : 'getPage'](this.startCrawling);
 		this.urlRequestRunning = true;
 	}
 };
@@ -53,7 +64,9 @@ CrawlerThread.prototype.startCrawling = function(url) {
 		onComplete: this.crawlDone.bind(this),
 		userAgent: this.userAgent,
 		parentId: this.id,
-		thread: this
+		thread: this,
+		pageTransform: this.config.pageTransform,
+		plugins: this.config.plugins
 	});
 
 	if (this.nbCrawlers < this.maxCrawlers) {
@@ -72,7 +85,7 @@ CrawlerThread.prototype.isIdle = function() {
 };
 
 CrawlerThread.prototype.exit = function() {
-	console.log('[' + this.id + '] Exiting ' + (this.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
+	console.log('[' + this.id + '] Exiting ' + (this.config.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
 	this.exited = true;
 	if (!this.phantom) {
 		// We might exit before phantom had time to start (eg. crawling only one image)

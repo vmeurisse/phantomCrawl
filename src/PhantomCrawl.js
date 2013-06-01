@@ -8,6 +8,21 @@ var RessourceCrawler = require('./crawler/RessourceCrawler');
 var urlStore = require('./url/urlStore');
 var urlToPath = require('./url/urlToPath');
 
+/**
+ * @class PhantomCrawl
+ * @constructor
+ *
+ * @param config {Object}
+ * @param config.urls {Array.string} Urls to crawl
+ * @param [config.base='extract'] {string} path of the folder to store extracts
+ * @param [config.urlFilters] {Array}
+ * @param [config.maxDepth=0] {integer}
+ * @param [config.useragent] {string}
+ * @param [config.nbThreads=1] {integer}
+ * @param [config.crawlerPerThread=1] {integer}
+ * @param [config.pageTransform] {Array}
+ * @param [config.plugins] {Array}
+ */
 var PhantomCrawl = function(config) {
 	this.config = config;
 	urlToPath.setBase(config.base || 'extract');
@@ -41,7 +56,9 @@ PhantomCrawl.prototype.startThread = function(crashRecover) {
 	var thread = new CrawlerThread({
 		crashRecover: crashRecover,
 		nbCrawlers: crashRecover ? 1 : this.config.crawlerPerThread,
-		userAgent: this.config.userAgent
+		userAgent: this.config.userAgent,
+		pageTransform: this.config.pageTransform,
+		plugins: this.config.plugins
 	});
 	thread.on('idle', this.checkFinish.bind(this));
 	thread.on('crash', this.threadCrash.bind(this, thread));
