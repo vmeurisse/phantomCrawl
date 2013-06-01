@@ -1,7 +1,6 @@
 'use strict';
 
-var PhantomCrawl = require('./PhantomCrawl');
-
+var PhantomCrawl = require('./src/PhantomCrawl');
 
 var urls = [];
 
