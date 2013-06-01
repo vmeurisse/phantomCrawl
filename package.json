@@ -4,11 +4,26 @@
 	"author": "Vincent Meurisse <dev@meurisse.org>",
 	"description": "Web crawler for ajax applications",
 	"keywords": ["ajax", "crawler", "crawl", "SEO", "phantom", "phantomjs"],
+	"homepage": "https://github.com/vmeurisse/phantomCrawl",
+	"bugs": {
+		"url": "https://github.com/vmeurisse/phantomCrawl/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vmeurisse/phantomCrawl.git"
+	},
+	"main": "src/PhantomCrawl.js",
 	"dependencies": {
 		"async": "0.2.x",
 		"node-fs": "~0.1.5",
 		"node-phantom": "https://github.com/vmeurisse/node-phantom/archive/56a10de0b3dddb4645bb3dadd98ed437aca6a9c4.tar.gz",
 		"phantomjs": "1.8.2-2",
 		"smpl": "0.2.0-alpha2"
+	},
+	"devDependencies": {
+		"smpl-build-test": "~0.5.0"
+	},
+	"scripts": {
+		"doc": "jake doc"
 	}
 }

@@ -14,6 +14,10 @@ var STANDARD_FILTERS = {
 	'crash': './filters/crash'
 };
 
+/**
+ * @module urlStore
+ * @class urlStore
+ */
 var urlStore = {
 	urlMap: {},
 	urlPages: [],
@@ -42,6 +46,8 @@ urlStore.setFilters = function(filters) {
 /**
  * Add an url to the list of URLs to crawl
  * 
+ * @method add
+ *
  * @param url {Object} Url to add
  * @param url.url {String} Url to add
  * @param url.level {number}
@@ -106,6 +112,9 @@ urlStore.getRessource = function(cb) {
 };
 
 /**
+ * 
+ * @method get
+ *
  * @private
  */
 urlStore.get = function(type, cb) {
@@ -120,6 +129,9 @@ urlStore.get = function(type, cb) {
 };
 
 /**
+ * 
+ * @method cancelGet
+ *
  * @private
  */
 urlStore.cancelGet = function(type, callback) {
@@ -137,6 +149,9 @@ urlStore.isEmpty = function() {
 };
 
 /**
+ * 
+ * @method call
+ *
  * @private
  */
 urlStore.call = function(cb, url, type) {

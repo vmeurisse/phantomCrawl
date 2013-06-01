@@ -35,6 +35,18 @@ var FORWARDED_EVENTS = {
 	'resourceError': 'onResourceError'
 };
 
+/**
+ * @class Crawler
+ * @constructor
+ *
+ * @param phantom {Object} Instance of phantom created by node-phantom
+ * @param config {Object}
+ * @param config.url {Object}
+ * @param [config.pageTransform] {Array}
+ * @param [config.plugins] {Array}
+ * @param config.thread {CrawlerThread}
+ * @param config.onComplete {function}
+ */
 var Crawler = function(phantom, config) {
 	this.id = config.parentId + '-' + smpl.utils.uniq();
 	this.config = config;

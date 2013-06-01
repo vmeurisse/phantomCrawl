@@ -1,3 +1,4 @@
-node_modules
-extract
+/node_modules
+/extract
+/docs
 

@@ -8,6 +8,9 @@ var PAGE_MIME = smpl.data.index(['text/html', 'application/xhtml+xml']);
 var urlType = {};
 
 /**
+ *
+ * @method isPage
+ * 
  * @param url {Object}
  * @param url.url {string} Url of the ressource. Used for extention detection if mime is not provided
  * @param [url.mime] {string} Mime type of the content if known. Used for accurate type detection

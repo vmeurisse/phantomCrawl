@@ -3,6 +3,8 @@
 /**
  * Clean the page from any JS that could interfere with the resulting snapshot.
  * Keeping the JS could have all sort of unexpected behaviour when reopening the page
+ *
+ * @module cleanJs
  */
 module.exports = function() {
 	var nodeList = document.querySelectorAll('*');
