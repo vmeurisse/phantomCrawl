@@ -10,8 +10,9 @@ var urlStore = require('../url/urlStore');
 
 var CrawlerThread = function(config) {
 	this.id = smpl.utils.uniq();
+	this.crashRecover = config.crashRecover;
 	
-	console.log('[' + this.id + '] Starting CrawlerThread');
+	console.log('[' + this.id + '] Starting ' + (this.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
 	this.nbCrawlers = 0;
 	this.maxCrawlers = config.nbCrawlers || 1;
 	this.userAgent = config.userAgent;
@@ -38,7 +39,7 @@ CrawlerThread.prototype.phantomStarted = function(err, phantom) {
 
 CrawlerThread.prototype.requestUrl = function() {
 	if (!this.urlRequestRunning && !this.exited) {
-		urlStore.getPage(this.startCrawling);
+		urlStore[this.crashRecover ? 'getCrashedPage' : 'getPage'](this.startCrawling);
 		this.urlRequestRunning = true;
 	}
 };
@@ -71,7 +72,7 @@ CrawlerThread.prototype.isIdle = function() {
 };
 
 CrawlerThread.prototype.exit = function() {
-	console.log('[' + this.id + '] Exiting CrawlerThread');
+	console.log('[' + this.id + '] Exiting ' + (this.crashRecover ? 'crashRecover' : 'Crawler') + ' Thread');
 	this.exited = true;
 	if (!this.phantom) {
 		// We might exit before phantom had time to start (eg. crawling only one image)

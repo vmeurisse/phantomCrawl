@@ -6,6 +6,8 @@ var util = require('util');
 var async = require('async');
 var smpl = require('smpl');
 
+var urlStore = require('../url/urlStore');
+
 var DEFAULT_TRANSFORMS = ['cleanInlineCss', 'cleanJs', 'absoluteUrls', 'canvas', 'inputs', 'white'];
 var STANDARD_TRANSFORMS = {
 	cleanJs: './transforms/cleanJs',
@@ -151,6 +153,11 @@ Crawler.prototype.onClosed = function(reason) {
 
 Crawler.prototype.crashed = function() {
 	this.phantomCrashed = true;
+	
+	var url = smpl.object.update({}, this.config.url);
+	url.crashed++;
+	urlStore.add(url, true);
+	
 	this.close('phantom crashed');
 };
 

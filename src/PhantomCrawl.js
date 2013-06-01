@@ -37,9 +37,10 @@ var PhantomCrawl = function(config) {
 	this.threads.push(rc);
 };
 
-PhantomCrawl.prototype.startThread = function() {
+PhantomCrawl.prototype.startThread = function(crashRecover) {
 	var thread = new CrawlerThread({
-		nbCrawlers: this.config.crawlerPerThread,
+		crashRecover: crashRecover,
+		nbCrawlers: crashRecover ? 1 : this.config.crawlerPerThread,
 		userAgent: this.config.userAgent
 	});
 	thread.on('idle', this.checkFinish.bind(this));
@@ -52,7 +53,11 @@ PhantomCrawl.prototype.threadCrash = function(thread) {
 	this.threads = this.threads.filter(function(t) {
 		return t !== thread;
 	});
-	this.startThread();
+	this.startThread(thread.crashRecover);
+	if (!this.hasCrashRecoverThread) {
+		this.hasCrashRecoverThread = true;
+		this.startThread(true);
+	}
 };
 
 PhantomCrawl.prototype.checkFinish = function() {

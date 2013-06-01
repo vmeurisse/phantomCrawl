@@ -7,17 +7,20 @@ var smpl = require('smpl');
 var urlToPath = require('./urlToPath');
 var urlType = require('./urlType');
 
-var DEFAULT_FILTERS = ['domain', 'level'];
+var DEFAULT_FILTERS = ['domain', 'level', 'crash'];
 var STANDARD_FILTERS = {
 	'domain': './filters/domain',
-	'level': './filters/level'
+	'level': './filters/level',
+	'crash': './filters/crash'
 };
 
 var urlStore = {
 	urlMap: {},
 	urlPages: [],
+	urlCrashedPages: [],
 	urlRessources: [],
 	cbPages: [],
+	cbCrashedPages: [],
 	cbRessources: [],
 	ongoingCallbacks: []
 };
@@ -42,13 +45,15 @@ urlStore.setFilters = function(filters) {
  * @param url {Object} Url to add
  * @param url.url {String} Url to add
  * @param url.level {number}
+ * @param [url.crashed=0] {number}
  * @param [url.mime] {String} If mime type is known, it need to be set
  * @param force {boolean} Set it to true if ressubmiting an url that had the wrong type. `url.mime` is mandatory in that case
  */
 urlStore.add = function(url, force) {
-	this.normalise(url);
 	if ((force || !this.urlMap[url.path]) && this.isValid(url)) {
-		var type = urlType.isPage(url) ? 'Pages' : 'Ressources';
+		var type = url.crashed ? 'CrashedPages' :
+		           urlType.isPage(url) ? 'Pages' :
+		           'Ressources';
 		this.urlMap[url.path] = type;
 		
 		var cb = this['cb' + type];
@@ -64,6 +69,7 @@ urlStore.add = function(url, force) {
 };
 
 urlStore.isValid = function(url) {
+	this.normalise(url);
 	for (var i = 0; i < this.urlFilters.length; i++) {
 		if (!this.urlFilters[i].filter(url)) return false;
 	}
@@ -74,6 +80,7 @@ urlStore.normalise = function(url) {
 	url.url = urlModule.format(urlModule.parse(url.url));
 	url.path = urlToPath.getPath(url.url);
 	url.level = url.level || 0;
+	url.crashed = url.crashed || 0;
 	url.primary = url.primary || false;
 	url.mime = url.mime || undefined;
 };
@@ -84,6 +91,14 @@ urlStore.getPage = function(cb) {
 
 urlStore.cancelGetPage = function(cb) {
 	this.cancelGet('Pages', cb);
+};
+
+urlStore.getCrashedPage = function(cb) {
+	this.get('CrashedPages', cb);
+};
+
+urlStore.cancelCrashedPage = function(cb) {
+	this.cancelGet('CrashedPages', cb);
 };
 
 urlStore.getRessource = function(cb) {
@@ -118,7 +133,7 @@ urlStore.cancelGet = function(type, callback) {
 };
 
 urlStore.isEmpty = function() {
-	return this.urlRessources.length + this.urlPages.length + this.ongoingCallbacks.length === 0;
+	return this.urlRessources.length + this.urlPages.length + this.urlCrashedPages.length + this.ongoingCallbacks.length === 0;
 };
 
 /**
