@@ -8,11 +8,12 @@ var smpl = require('smpl');
 
 var urlStore = require('../url/urlStore');
 
-var DEFAULT_TRANSFORMS = ['cleanInlineCss', 'cleanJs', 'absoluteUrls', 'canvas', 'inputs', 'white'];
+var DEFAULT_TRANSFORMS = ['cleanInlineCss', 'cleanJs', 'absoluteUrls', 'canvas', 'inputs', 'charset', 'white'];
 var STANDARD_TRANSFORMS = {
-	cleanJs: './transforms/cleanJs',
 	absoluteUrls: './transforms/absoluteUrls',
 	canvas: './transforms/canvas',
+	charset: './transforms/charset',
+	cleanJs: './transforms/cleanJs',
 	inputs: './transforms/inputs',
 	cleanInlineCss: './transforms/cleanInlineCss',
 	fixFocus: './transforms/fixFocus',
