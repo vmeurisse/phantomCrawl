@@ -21,7 +21,8 @@
 		"smpl": "0.2.0-alpha2"
 	},
 	"devDependencies": {
-		"smpl-build-test": "~0.5.0"
+		"smpl-build-test": "~0.5.0",
+		"jake": "0.5.x"
 	},
 	"scripts": {
 		"doc": "jake doc"
