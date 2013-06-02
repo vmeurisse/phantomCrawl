@@ -13,7 +13,7 @@ urlToPath.getPath = function(url) {
 	url = urlModule.parse(url);
 	
 	var path = [this.basePath, url.hostname];
-	path = path.concat(url.pathname.split('/').slice(1));
+	path = path.concat(decodeURIComponent(url.pathname).split('/').slice(1));
 	if (path[path.length - 1] === '') {
 		// URL ends with a slash. It is a folder
 		path[path.length - 1] = 'index.html';
