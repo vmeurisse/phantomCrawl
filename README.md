@@ -4,7 +4,7 @@ phantomCrawl
 Links
 -----
 
-[![NPM version](https://badge.fury.io/js/phantomCrawl.png)](http://badge.fury.io/js/phantomCrawl)
+[![NPM version](https://badge.fury.io/js/phantom-crawl.png)](http://badge.fury.io/js/phantom-crawl)
 
 [![Build status](https://secure.travis-ci.org/vmeurisse/phantomCrawl.png?branch=master)](http://travis-ci.org/vmeurisse/phantomCrawl)
 

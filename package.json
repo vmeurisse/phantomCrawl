@@ -1,6 +1,6 @@
 {
-	"name": "phantomCrawl",
-	"version": "0.0.1",
+	"name": "phantom-crawl",
+	"version": "0.0.2",
 	"author": "Vincent Meurisse <dev@meurisse.org>",
 	"description": "Web crawler for ajax applications",
 	"keywords": ["ajax", "crawler", "crawl", "SEO", "phantom", "phantomjs"],
