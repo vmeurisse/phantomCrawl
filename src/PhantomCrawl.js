@@ -22,6 +22,7 @@ var urlToPath = require('./url/urlToPath');
  * @param [config.crawlerPerThread=1] {integer}
  * @param [config.pageTransform] {Array}
  * @param [config.plugins] {Array}
+ * @param [config.phantomPath] {String} Path of the phantom executable. Default is to use the bundled phantomjs.
  */
 var PhantomCrawl = function(config) {
 	this.config = config;
@@ -58,7 +59,8 @@ PhantomCrawl.prototype.startThread = function(crashRecover) {
 		nbCrawlers: crashRecover ? 1 : this.config.crawlerPerThread,
 		userAgent: this.config.userAgent,
 		pageTransform: this.config.pageTransform,
-		plugins: this.config.plugins
+		plugins: this.config.plugins,
+		phantomPath: this.config.phantomPath
 	});
 	thread.on('idle', this.checkFinish.bind(this));
 	thread.on('crash', this.threadCrash.bind(this, thread));

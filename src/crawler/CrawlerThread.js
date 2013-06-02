@@ -18,6 +18,7 @@ var urlStore = require('../url/urlStore');
  * @param [config.crashRecover=false] {boolean} If true, will crawl the URLs from the previously crashed threads
  * @param [config.pageTransform] {Array}
  * @param [config.plugins] {Array}
+ * @param [config.phantomPath] {String}
  */
 var CrawlerThread = function(config) {
 	this.config = config;
@@ -30,7 +31,7 @@ var CrawlerThread = function(config) {
 	
 	this.startCrawling = this.startCrawling.bind(this);
 	
-	require('node-phantom').create(this.phantomStarted.bind(this), {phantomPath: require('phantomjs').path});
+	require('node-phantom').create(this.phantomStarted.bind(this), {phantomPath: config.phantomPath || require('phantomjs').path});
 };
 util.inherits(CrawlerThread, EventEmitter);
 
