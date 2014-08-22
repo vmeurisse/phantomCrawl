@@ -13,4 +13,4 @@ Links
 Licence
 -------
 
-This project is licensed under the [MIT Licence](http://en.wikipedia.org/wiki/MIT_License). See LICENCE.txt for details.
+This project is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License). See LICENSE.txt for details.
