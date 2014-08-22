@@ -10,7 +10,7 @@ Links
 
 [![Code statistics](http://www.ohloh.net/p/phantomCrawl/widgets/project_thin_badge.gif)](https://www.ohloh.net/p/phantomCrawl)
 
-Licence
+License
 -------
 
-This project is licensed under the [MIT Licence](http://en.wikipedia.org/wiki/MIT_License). See LICENCE.txt for details.
+This project is licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License). See LICENSE.txt for details.
